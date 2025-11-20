@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <title>Learn With Rubel123 – Playwright Python SDET Handbook</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
+
+  <!-- Highlight.js for code formatting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+  <style>
+    body { background-color: #f7f9fc; }
+    .dark body { background-color: #020617; }
+    .chapter h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .code-title { font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.25rem; }
+    .dark .code-title { color: #cbd5f5; }
+    pre { position: relative; }
+    .copy-btn {
+      position: absolute;
+      top: 0.4rem;
+      right: 0.4rem;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      background: rgba(15,23,42,0.8);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .copy-btn.copied {
+      background: #16a34a;
+    }
+  </style>
+
+  <script>
+    // SEARCH
+    function searchContent() {
+      const input = document.getElementById("searchBox").value.toLowerCase();
+      const chapters = document.getElementsByClassName("chapter");
+
+      for (let i = 0; i < chapters.length; i++) {
+        const text = chapters[i].innerText.toLowerCase();
+        chapters[i].style.display = text.includes(input) ? "" : "none";
+      }
+    }
+
+    // DARK MODE
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      localStorage.setItem('rubel-python-dark-mode', html.classList.contains('dark') ? 'on' : 'off');
+    }
+
+    // On load: remember dark mode + init highlight.js + copy buttons
+    document.addEventListener('DOMContentLoaded', () => {
+      // Dark mode preference
+      const saved = localStorage.getItem('rubel-python-dark-mode');
+      if (saved === 'on') {
+        document.documentElement.classList.add('dark');
+      }
+
+      // Highlight.js
+      hljs.highlightAll();
+
+      // Add copy buttons to each code block
+      document.querySelectorAll('pre code').forEach((block) => {
+        const button = document.createElement('button');
+        button.innerText = 'Copy';
+        button.className = 'copy-btn';
+        button.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(block.innerText);
+            button.classList.add('copied');
+            button.innerText = 'Copied!';
+            setTimeout(() => {
+              button.classList.remove('copied');
+              button.innerText = 'Copy';
+            }, 1500);
+          } catch (err) {
+            console.error('Copy failed', err);
+          }
+        });
+        block.parentNode.appendChild(button);
+      });
+    });
+  </script>
+</head>
+
+<body class="p-6 text-gray-900 dark:text-gray-100">
+
+  <!-- HEADER / BRANDING -->
+  <div class="max-w-6xl mx-auto text-center my-8">
+    <!-- Logo (make sure channels4_profile.jpg is in the same folder) -->
+    <img src="channels4_profile.jpg"
+         alt="Learn With Rubel Logo"
+         class="w-24 h-24 mx-auto rounded-full shadow-lg border-4 border-blue-600 dark:border-blue-300" />
+
+    <h1 class="text-3xl md:text-4xl font-bold mt-4 text-blue-700 dark:text-blue-300">
+      Learn With Rubel123 – Playwright Python SDET Handbook
+    </h1>
+
+    <p class="text-sm md:text-base mt-2 text-gray-600 dark:text-gray-300">
+      Your Complete Playwright + Python Notes • By <strong>Md Rubel</strong>
+    </p>
+
+    <a href="https://www.youtube.com/@LearnWithRubel123"
+       target="_blank"
+       class="text-blue-500 dark:text-blue-300 underline mt-2 inline-block text-sm">
+      Visit My YouTube Channel
+    </a>
+
+    <div class="mt-4 flex justify-center">
+      <button onclick="toggleDarkMode()"
+              class="px-3 py-2 text-xs md:text-sm rounded-full border border-gray-300 dark:border-slate-600 shadow-sm hover:bg-gray-100 dark:hover:bg-slate-800">
+        🌙 / ☀️ Dark Mode
+      </button>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="max-w-6xl mx-auto my-4">
+    <input
+      id="searchBox"
+      onkeyup="searchContent()"
+      type="text"
+      placeholder="Search any Playwright Python / SDET topic or code snippet…"
+      class="w-full px-4 py-3 border rounded-xl shadow-sm focus:ring-blue-500 focus:outline-none
+             border-gray-300 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100"
+    />
+  </div>
+
+  <!-- HOW TO EXTEND -->
+  <div class="max-w-6xl mx-auto my-3 text-xs text-gray-500 dark:text-gray-400">
+    <!-- To add more topics later, copy one of the <div class="chapter"> blocks below and paste a new one at the bottom. -->
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="max-w-6xl mx-auto space-y-10">
+
+    <!-- ============================================= -->
+    <!-- SECTION 1 – PLAYWRIGHT PYTHON CONCEPTS        -->
+    <!-- ============================================= -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2 class="text-2xl font-bold mb-3">SECTION 1 – Playwright Python Concepts</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        Core Playwright concepts using <code>Python</code>, <code>Pytest</code>, <code>OrangeHRM</code>, and <code>Wikipedia</code>.
+      </p>
+    </div>
+
+    <!-- 1.1 – INSTALL & PROJECT SETUP -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.1 – Installation & Project Setup (Python)</h2>
+
+      <p class="mb-2 font-semibold">Create virtual environment (optional but recommended)</p>
+<pre><code class="language-bash">
+# Create and activate venv (Mac/Linux)
+python3 -m venv venv
+source venv/bin/activate
+
+# On Windows
+python -m venv venv
+venv\Scripts\activate
+</code></pre>
+
+      <p class="mt-4 mb-2 font-semibold">Install Playwright + Pytest plugins</p>
+<pre><code class="language-bash">
+pip install pytest pytest-playwright
+
+# Install browsers
+playwright install
+</code></pre>
+
+      <p class="mt-4 mb-2 font-semibold">Basic project structure</p>
+<pre><code class="language-text">
+python-playwright-orangehrm/
+ ├── tests/
+ │     ├── test_orangehrm_login.py
+ │     └── test_wikipedia_search.py
+ ├── pages/
+ │     ├── login_page.py
+ │     └── dashboard_page.py
+ ├── conftest.py
+ ├── requirements.txt
+ └── pytest.ini
+</code></pre>
+    </div>
+
+    <!-- 1.2 – SIMPLE TEST (ORANGEHRM LOGIN) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.2 – Simple Playwright Python Test (OrangeHRM Login)</h2>
+
+      <p class="code-title">tests/test_orangehrm_login.py</p>
+<pre><code class="language-python">
+from playwright.sync_api import Page, expect
+
+def test_orangehrm_valid_login(page: Page) -> None:
+    login_url = "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login"
+    page.goto(login_url)
+
+    # Assertions for title and URL
+    expect(page).to_have_title(lambda title: "OrangeHRM" in title)
+    assert "auth/login" in page.url
+
+    # Locators
+    username_input = page.locator('input[name="username"]')
+    password_input = page.locator('input[name="password"]')
+    login_button   = page.get_by_role("button", name="Login")
+
+    username_input.fill("Admin")
+    password_input.fill("admin123")
+    login_button.click()
+
+    # Dashboard check
+    expect(page).to_have_url(lambda url: "dashboard" in url)
+    header = page.locator("h6.oxd-text--h6")
+    expect(header).to_contain_text("Dashboard")
+</code></pre>
+    </div>
+
+    <!-- 1.3 – LOCATORS WITH WIKIPEDIA -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.3 – Locators (ID, Text, Role, nth) – Wikipedia Example</h2>
+
+      <p class="code-title">tests/test_wikipedia_search.py</p>
+<pre><code class="language-python">
+from playwright.sync_api import Page, expect
+
+def test_wikipedia_search_playwright(page: Page) -> None:
+    page.goto("https://www.wikipedia.org/")
+
+    # By ID
+    search_input = page.locator("#searchInput")
+
+    # By role + name
+    english_link = page.get_by_role("link", name="English")
+
+    # Assertions
+    expect(english_link).to_be_visible()
+
+    english_link.click()
+    expect(page).to_have_url("https://en.wikipedia.org/")
+
+    search_input = page.locator("input[name='search']")
+    search_input.fill("Playwright")
+    search_input.press("Enter")
+
+    expect(page).to_have_title(lambda t: "Playwright" in t)
+</code></pre>
+    </div>
+
+    <!-- 1.4 – ASSERTIONS CHEAT SHEET -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.4 – Assertions Cheat Sheet (Python Playwright)</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import Page, expect
+
+def test_assertions_example(page: Page) -> None:
+    page.goto("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login")
+
+    expect(page).to_have_title(lambda t: "OrangeHRM" in t)
+    expect(page).to_have_url(lambda url: "auth/login" in url)
+
+    username_input = page.locator("input[name='username']")
+    login_button   = page.get_by_role("button", name="Login")
+
+    expect(username_input).to_be_visible()
+    expect(login_button).to_be_enabled()
+    expect(login_button).to_have_text("Login")
+</code></pre>
+    </div>
+
+    <!-- 1.5 – WAITING & TIMEOUTS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.5 – Waiting & Timeouts</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import Page
+
+def test_wait_examples(page: Page) -> None:
+    page.goto("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login")
+
+    # Hard wait (debug only)
+    page.wait_for_timeout(3000)
+
+    # Wait for element to appear
+    page.wait_for_selector("input[name='username']")
+
+    # Locators auto-wait when you call actions
+    page.locator("input[name='username']").fill("Admin")
+</code></pre>
+    </div>
+
+    <!-- 1.6 – ALL LINKS & CLICK SPECIFIC (WIKIPEDIA) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.6 – All Links & Click Specific Link (Wikipedia)</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import Page, expect
+
+def test_wikipedia_links(page: Page) -> None:
+    page.goto("https://www.wikipedia.org/")
+
+    links = page.locator("a")
+    count = links.count()
+    print("Total links:", count)
+    assert count > 10
+
+    # Click English language link
+    page.get_by_role("link", name="English").click()
+    expect(page).to_have_url("https://en.wikipedia.org/")
+</code></pre>
+    </div>
+
+    <!-- 1.7 – SPLIT TEXT (EMAIL / DOMAIN EXAMPLE) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.7 – Extract & Split Text in Python</h2>
+
+<pre><code class="language-python">
+text = "Contact us at support@examplecompany.com for more details"
+
+# Split around 'at'
+parts = text.split("at")
+email_part = parts[1].strip()            # "support@examplecompany.com for more details"
+email_only = email_part.split()[0]       # "support@examplecompany.com"
+
+domain_only = email_only.split("@")[1]   # "examplecompany.com"
+
+print(email_only)
+print(domain_only)
+</code></pre>
+    </div>
+
+    <!-- 1.8 – BASIC API TEST USING REQUEST CONTEXT -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.8 – Basic API Testing with Playwright Python</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import APIRequestContext, expect, Playwright, sync_playwright
+
+def test_get_users_api(playwright: Playwright) -> None:
+    request_context: APIRequestContext = playwright.request.new_context()
+    response = request_context.get("https://reqres.in/api/users?page=2")
+
+    assert response.ok
+    assert response.status == 200
+
+    data = response.json()
+    print(data)
+    assert len(data["data"]) > 0
+</code></pre>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SECTION 2 – END-TO-END POM FRAMEWORK          -->
+    <!-- ============================================= -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2 class="text-2xl font-bold mb-3">SECTION 2 – End-to-End Framework (Playwright Python + Pytest + POM)</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        Production-style framework with OrangeHRM using Page Object Model, Pytest, and parallel execution.
+      </p>
+    </div>
+
+    <!-- 2.1 – FRAMEWORK STRUCTURE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.1 – Framework Folder Structure</h2>
+
+<pre><code class="language-text">
+python_playwright_orangehrm/
+ ├── pages/
+ │     ├── base_page.py
+ │     ├── login_page.py
+ │     └── dashboard_page.py
+ ├── tests/
+ │     ├── test_login_valid.py
+ │     └── test_login_invalid.py
+ ├── test_data/
+ │     └── users.json
+ ├── conftest.py
+ ├── requirements.txt
+ ├── pytest.ini
+ └── README.md
+</code></pre>
+    </div>
+
+    <!-- 2.2 – REQUIREMENTS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.2 – requirements.txt</h2>
+
+<pre><code class="language-text">
+pytest
+pytest-playwright
+pytest-xdist
+allure-pytest
+</code></pre>
+    </div>
+
+    <!-- 2.3 – PYTEST.INI (PARALLEL READY) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.3 – pytest.ini (Markers, Options)</h2>
+
+<pre><code class="language-text">
+[pytest]
+addopts = -v
+testpaths = tests
+</code></pre>
+    </div>
+
+    <!-- 2.4 – CONFTEST.PY (SHARED FIXTURES) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.4 – conftest.py (Browser/Page Fixtures)</h2>
+
+<pre><code class="language-python">
+import pytest
+from playwright.sync_api import Playwright, sync_playwright, Browser, Page
+
+@pytest.fixture(scope="session")
+def playwright_instance() -> Playwright:
+    with sync_playwright() as p:
+        yield p
+
+@pytest.fixture(scope="session")
+def browser(playwright_instance: Playwright) -> Browser:
+    browser = playwright_instance.chromium.launch(headless=False)
+    yield browser
+    browser.close()
+
+@pytest.fixture
+def page(browser: Browser) -> Page:
+    context = browser.new_context(viewport={"width": 1280, "height": 720})
+    page = context.new_page()
+    yield page
+    context.close()
+</code></pre>
+    </div>
+
+    <!-- 2.5 – BASE PAGE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.5 – Base Page (pages/base_page.py)</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import Page
+
+class BasePage:
+    def __init__(self, page: Page):
+        self.page = page
+
+    def goto(self, url: str) -> None:
+        self.page.goto(url)
+
+    def click(self, locator: str) -> None:
+        self.page.locator(locator).click()
+
+    def fill(self, locator: str, value: str) -> None:
+        self.page.locator(locator).fill(value)
+</code></pre>
+    </div>
+
+    <!-- 2.6 – LOGIN PAGE POM -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.6 – Login Page POM (pages/login_page.py)</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import Page
+from .base_page import BasePage
+
+class LoginPage(BasePage):
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.username_input = page.locator("input[name='username']")
+        self.password_input = page.locator("input[name='password']")
+        self.login_button   = page.get_by_role("button", name="Login")
+        self.error_message  = page.locator(".oxd-alert-content-text")
+        self.login_url      = "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login"
+
+    def open(self) -> None:
+        self.page.goto(self.login_url)
+
+    def login(self, username: str, password: str) -> None:
+        self.username_input.fill(username)
+        self.password_input.fill(password)
+        self.login_button.click()
+</code></pre>
+    </div>
+
+    <!-- 2.7 – DASHBOARD PAGE POM -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.7 – Dashboard Page POM (pages/dashboard_page.py)</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import Page, expect
+from .base_page import BasePage
+
+class DashboardPage(BasePage):
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.header = page.locator("h6.oxd-text--h6")
+        self.user_dropdown = page.locator(".oxd-userdropdown-name")
+        self.logout_link = page.get_by_role("menuitem", name="Logout")
+
+    def assert_on_dashboard(self) -> None:
+        expect(self.header).to_contain_text("Dashboard")
+
+    def logout(self) -> None:
+        self.user_dropdown.click()
+        self.logout_link.click()
+</code></pre>
+    </div>
+
+    <!-- 2.8 – TEST: VALID LOGIN (POM) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.8 – Test: Valid Login (tests/test_login_valid.py)</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import Page
+from pages.login_page import LoginPage
+from pages.dashboard_page import DashboardPage
+
+def test_valid_login(page: Page) -> None:
+    login_page = LoginPage(page)
+    dashboard_page = DashboardPage(page)
+
+    login_page.open()
+    login_page.login("Admin", "admin123")
+
+    dashboard_page.assert_on_dashboard()
+</code></pre>
+    </div>
+
+    <!-- 2.9 – TEST: INVALID LOGIN -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.9 – Test: Invalid Login Shows Error (tests/test_login_invalid.py)</h2>
+
+<pre><code class="language-python">
+from playwright.sync_api import Page, expect
+from pages.login_page import LoginPage
+
+def test_invalid_login_shows_error(page: Page) -> None:
+    login_page = LoginPage(page)
+
+    login_page.open()
+    login_page.login("wrongUser", "wrongPass")
+
+    expect(login_page.error_message).to_be_visible()
+</code></pre>
+    </div>
+
+    <!-- 2.10 – RUN TESTS IN PARALLEL -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.10 – Run Tests in Parallel (pytest-xdist)</h2>
+
+<pre><code class="language-bash">
+# Run all tests
+pytest
+
+# Run tests in 4 parallel workers
+pytest -n 4
+
+# Run tests with markers, verbose
+pytest -v -n auto
+</code></pre>
+    </div>
+
+    <!-- 2.11 – ALLURE REPORT FOR PYTHON -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.11 – Allure Report (Playwright + Pytest)</h2>
+
+<pre><code class="language-bash">
+# Install allure-pytest plugin
+pip install allure-pytest
+
+# Run tests with allure results
+pytest --alluredir=allure-results
+
+# Generate HTML report
+allure generate allure-results --clean -o allure-report
+
+# Open the report
+allure open allure-report
+</code></pre>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- SECTION 3 – CORE PYTHON FOR SDET              -->
+    <!-- ============================================= -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2 class="text-2xl font-bold mb-3">SECTION 3 – Core Python Concepts for SDET</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        Python basics that you use every day in Playwright automation and backend testing.
+      </p>
+    </div>
+
+    <!-- 3.1 – VARIABLES & DATA TYPES -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.1 – Variables & Data Types</h2>
+
+<pre><code class="language-python">
+name = "Rubel"          # string
+age = 30                # int
+price = 19.99           # float
+is_active = True        # bool
+skills = ["Python", "Playwright"]  # list
+user = {"name": "Rubel", "role": "SDET"}  # dict
+</code></pre>
+    </div>
+
+    <!-- 3.2 – FUNCTIONS & DEFAULT ARGS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.2 – Functions & Default Arguments</h2>
+
+<pre><code class="language-python">
+def add(a, b):
+    return a + b
+
+def greet(name="Tester"):
+    return f"Hello, {name}!"
+
+print(add(2, 3))
+print(greet())
+print(greet("Rubel"))
+</code></pre>
+    </div>
+
+    <!-- 3.3 – LISTS, LOOPS, COMPREHENSIONS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.3 – Lists, Loops, Comprehensions</h2>
+
+<pre><code class="language-python">
+nums = [1, 2, 3, 4, 5]
+
+for n in nums:
+    print(n)
+
+doubled = [n * 2 for n in nums]
+evens = [n for n in nums if n % 2 == 0]
+
+print(doubled)
+print(evens)
+</code></pre>
+    </div>
+
+    <!-- 3.4 – DICTS (LIKE JSON) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.4 – Dictionaries (like JSON objects)</h2>
+
+<pre><code class="language-python">
+user = {
+    "name": "Rubel",
+    "role": "SDET",
+    "skills": ["Python", "Playwright"]
+}
+
+print(user["name"])
+print(user.get("role"))
+</code></pre>
+    </div>
+
+    <!-- 3.5 – STRING METHODS (SPLIT, STRIP, REPLACE) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.5 – String Methods (split, strip, replace)</h2>
+
+<pre><code class="language-python">
+text = "  Please email us at support@example.com  "
+
+clean = text.strip()
+parts = clean.split("at")
+email = parts[1].strip().split()[0]
+
+print(clean)
+print(email)
+</code></pre>
+    </div>
+
+    <!-- 3.6 – CLASSES & OBJECTS (OOP FOR POM) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.6 – Classes & Objects (similar to POM)</h2>
+
+<pre><code class="language-python">
+class Calculator:
+    def __init__(self, start: int = 0):
+        self.value = start
+
+    def add(self, n: int):
+        self.value += n
+
+    def get_result(self) -> int:
+        return self.value
+
+calc = Calculator()
+calc.add(5)
+print(calc.get_result())  # 5
+</code></pre>
+    </div>
+
+    <!-- 3.7 – EXCEPTION HANDLING -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.7 – Exception Handling</h2>
+
+<pre><code class="language-python">
+try:
+    number = int("abc")  # ValueError
+except ValueError as e:
+    print("Conversion failed:", e)
+</code></pre>
+    </div>
+
+    <!-- 3.8 – JSON & API DATA -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.8 – JSON Parsing</h2>
+
+<pre><code class="language-python">
+import json
+
+json_str = '{"name": "Rubel", "role": "SDET"}'
+data = json.loads(json_str)
+print(data["name"])
+
+back_to_str = json.dumps(data)
+print(back_to_str)
+</code></pre>
+    </div>
+
+    <!-- 3.9 – PYTHON + PLAYWRIGHT INTERVIEW NOTES -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.9 – Interview Notes (Python + Playwright)</h2>
+
+      <p class="mb-2"><strong>Q: Why use Pytest with Playwright?</strong></p>
+      <p class="text-sm">
+        A: Pytest provides powerful test discovery, fixtures, markers, and reporting. The
+        <code>pytest-playwright</code> plugin adds built-in fixtures like <code>page</code>, <code>browser</code>,
+        <code>context</code> so you can focus on test logic instead of setup/teardown.
+      </p>
+
+      <p class="mt-3 mb-2"><strong>Q: How do you run Playwright tests in parallel in Python?</strong></p>
+      <p class="text-sm">
+        A: Use <code>pytest-xdist</code> and run <code>pytest -n 4</code> or <code>pytest -n auto</code>, which
+        distributes tests across multiple workers.
+      </p>
+    </div>
+
+  </div> <!-- END MAIN WRAPPER -->
+
+  <br /><br />
+</body>
+</html>
