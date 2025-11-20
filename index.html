@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="UTF-8" />
+  <title>Playwright + JavaScript SDET Handbook - Md Rubel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
+
+  <!-- Highlight.js for code formatting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
+  <style>
+    body { background-color: #f7f9fc; }
+    .dark body { background-color: #020617; }
+    .chapter h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .code-title { font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.25rem; }
+    .dark .code-title { color: #cbd5f5; }
+    pre { position: relative; }
+    .copy-btn {
+      position: absolute;
+      top: 0.4rem;
+      right: 0.4rem;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 9999px;
+      background: rgba(15,23,42,0.8);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .copy-btn.copied {
+      background: #16a34a;
+    }
+  </style>
+
+  <script>
+    // SEARCH
+    function searchContent() {
+      const input = document.getElementById("searchBox").value.toLowerCase();
+      const chapters = document.getElementsByClassName("chapter");
+
+      for (let i = 0; i < chapters.length; i++) {
+        const text = chapters[i].innerText.toLowerCase();
+        chapters[i].style.display = text.includes(input) ? "" : "none";
+      }
+    }
+
+    // DARK MODE
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      localStorage.setItem('rubel-dark-mode', html.classList.contains('dark') ? 'on' : 'off');
+    }
+
+    // On load: remember dark mode + init highlight.js + copy buttons
+    document.addEventListener('DOMContentLoaded', () => {
+      // Dark mode preference
+      const saved = localStorage.getItem('rubel-dark-mode');
+      if (saved === 'on') {
+        document.documentElement.classList.add('dark');
+      }
+
+      // Highlight.js
+      hljs.highlightAll();
+
+      // Add copy buttons to each code block
+      document.querySelectorAll('pre code').forEach((block) => {
+        const button = document.createElement('button');
+        button.innerText = 'Copy';
+        button.className = 'copy-btn';
+        button.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(block.innerText);
+            button.classList.add('copied');
+            button.innerText = 'Copied!';
+            setTimeout(() => {
+              button.classList.remove('copied');
+              button.innerText = 'Copy';
+            }, 1500);
+          } catch (err) {
+            console.error('Copy failed', err);
+          }
+        });
+        block.parentNode.appendChild(button);
+      });
+    });
+  </script>
+</head>
+
+<body class="p-6 text-gray-900 dark:text-gray-100">
+
+  <!-- HEADER -->
+  <div class="text-center my-10">
+
+  <!-- Logo -->
+  <img src="channels4_profile.jpg"
+       alt="Learn With Rubel Logo"
+       class="w-32 h-32 mx-auto rounded-full shadow-lg border-4 border-blue-600 dark:border-blue-300" />
+
+  <!-- Title -->
+  <h1 class="text-4xl font-bold mt-4 text-blue-700 dark:text-blue-300">
+    Learn With Rubel123 – Playwright & JavaScript SDET Handbook
+  </h1>
+
+  <!-- Tagline -->
+  <p class="text-sm md:text-base mt-2 text-gray-600 dark:text-gray-300">
+    Your Complete Automation Notebook • By <strong>Md Rubel</strong>
+  </p>
+
+  <!-- YouTube Link -->
+  <a href="https://www.youtube.com/@LearnWithRubel123"
+     target="_blank"
+     class="text-blue-500 dark:text-blue-300 underline mt-2 block">
+     Visit My YouTube Channel
+  </a>
+
+</div>
+
+
+  <!-- SEARCH -->
+  <div class="max-w-6xl mx-auto my-4">
+    <input
+      id="searchBox"
+      onkeyup="searchContent()"
+      type="text"
+      placeholder="Search any Playwright/JS topic or code snippet in your handbook…"
+      class="w-full px-4 py-3 border rounded-xl shadow-sm focus:ring-blue-500 focus:outline-none
+             border-gray-300 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100"
+    />
+  </div>
+
+  <!-- HOW TO EXTEND NOTE -->
+  <div class="max-w-6xl mx-auto my-3 text-xs text-gray-500 dark:text-gray-400">
+    <!-- To add more topics later, copy one of the <div class="chapter"> blocks below and paste a new one at the bottom.
+         You can keep extending Section 1, Section 2, or Section 3 as your notes grow. -->
+  </div>
+
+  <!-- MAIN CONTENT WRAPPER -->
+  <div class="max-w-6xl mx-auto space-y-10">
+
+    <!-- ========================================================= -->
+    <!-- SECTION 1 – PLAYWRIGHT JS CONCEPTS                       -->
+    <!-- ========================================================= -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2 class="text-2xl font-bold mb-3">SECTION 1 – Playwright JavaScript Concepts</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        This section covers core Playwright concepts with examples using
+        <code>OrangeHRM</code>, <code>Wikipedia</code>, and other demo apps.
+      </p>
+    </div>
+
+    <!-- CH 1.1 – INSTALLATION & PROJECT SETUP -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.1 – Installation & Project Setup</h2>
+
+      <p class="mb-2 font-semibold">Create a new Playwright project</p>
+<pre><code class="language-bash">
+# Create folder
+mkdir playwright-sdet-handbook
+cd playwright-sdet-handbook
+
+# Initialize Node.js project
+npm init -y
+
+# Install Playwright test runner
+npm install --save-dev @playwright/test
+
+# Install default browsers (Chromium, Firefox, WebKit)
+npx playwright install
+</code></pre>
+
+      <p class="mt-4 mb-2 font-semibold">Basic project layout</p>
+<pre><code class="language-text">
+playwright-sdet-handbook/
+ ├── tests/
+ │     ├── orangehrm-login.spec.js
+ │     └── wikipedia.spec.js
+ ├── pages/
+ │     └── OrangeHRMLoginPage.js
+ ├── utils/
+ ├── test-data/
+ ├── playwright.config.js
+ ├── package.json
+ └── node_modules/
+</code></pre>
+    </div>
+
+    <!-- CH 1.2 – PLAYWRIGHT CONFIG + PARALLEL -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.2 – Playwright Config + Parallel Execution</h2>
+
+      <p class="code-title">playwright.config.js – basic with parallel workers</p>
+<pre><code class="language-js">
+// @ts-check
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
+  testDir: './tests',
+  timeout: 30 * 1000,
+  expect: {
+    timeout: 5000
+  },
+  fullyParallel: true,      // allow tests in a file to run in parallel if test.describe.configure
+  workers: 4,               // number of parallel workers (or use 'auto')
+  retries: 1,               // retry failed tests once
+  reporter: [
+    ['list'],
+    ['html'],
+    // Allure reporter will be added in Section 2
+  ],
+  use: {
+    browserName: 'chromium',
+    headless: false,
+    viewport: { width: 1280, height: 720 },
+    actionTimeout: 10 * 1000,
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure'
+  }
+});
+</code></pre>
+
+      <p class="mt-4 code-title">Run tests in parallel from CLI</p>
+<pre><code class="language-bash">
+# Default (uses workers from config or auto)
+npx playwright test
+
+# Override workers from CLI (e.g., 4 parallel workers)
+npx playwright test --workers=4
+
+# Run only Chromium headed in parallel
+npx playwright test --browser=chromium --headed
+</code></pre>
+    </div>
+
+    <!-- CH 1.3 – BROWSER, CONTEXT, PAGE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.3 – Browser, Context, and Page</h2>
+
+<pre><code class="language-js">
+const { test } = require('@playwright/test');
+
+test('Browser, context, page example', async ({ browser }) => {
+  // Create a fresh browser context (like a new incognito profile)
+  const context = await browser.newContext();
+
+  // Create a page (tab) inside context
+  const page = await context.newPage();
+
+  // Navigate to OrangeHRM
+  await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
+
+  // Perform actions ...
+});
+</code></pre>
+    </div>
+
+    <!-- CH 1.4 – LOCATORS (ORANGEHRM + WIKIPEDIA) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.4 – Locators (CSS, Text, Role, nth)</h2>
+
+      <p class="mb-2 font-semibold">OrangeHRM login locators</p>
+<pre><code class="language-js">
+const usernameInput = page.locator('input[name="username"]');
+const passwordInput = page.locator('input[name="password"]');
+const loginButton   = page.getByRole('button', { name: 'Login' }); // By role + accessible name
+</code></pre>
+
+      <p class="mt-4 mb-2 font-semibold">Wikipedia locators</p>
+<pre><code class="language-js">
+await page.goto('https://www.wikipedia.org/');
+
+// By ID
+const searchInput = page.locator('#searchInput');
+
+// By text
+const englishLink = page.getByRole('link', { name: 'English' });
+
+// By CSS class
+const footerLinks = page.locator('.footer a');
+</code></pre>
+
+      <p class="mt-4 mb-2 font-semibold">nth(), first(), last()</p>
+<pre><code class="language-js">
+const items = page.locator('.card-body b');
+
+const firstItemText = await items.first().textContent();
+const lastItemText  = await items.last().textContent();
+const thirdItemText = await items.nth(2).textContent();
+</code></pre>
+    </div>
+
+    <!-- CH 1.5 – ASSERTIONS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.5 – Assertions Cheat Sheet (expect)</h2>
+
+<pre><code class="language-js">
+const { test, expect } = require('@playwright/test');
+
+test('Assertion examples on OrangeHRM login page', async ({ page }) => {
+  await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
+
+  // Title and URL
+  await expect(page).toHaveTitle(/OrangeHRM/);
+  await expect(page).toHaveURL(/auth\/login/);
+
+  // Element is visible and enabled
+  const usernameInput = page.locator('input[name="username"]');
+  await expect(usernameInput).toBeVisible();
+
+  const loginButton = page.getByRole('button', { name: 'Login' });
+  await expect(loginButton).toBeEnabled();
+
+  // Text and attribute assertion
+  await expect(loginButton).toHaveText('Login');
+  await expect(usernameInput).toHaveAttribute('name', 'username');
+});
+</code></pre>
+    </div>
+
+    <!-- CH 1.6 – WAITING & TIMEOUTS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.6 – Waiting, Timeouts & Auto-Wait</h2>
+
+<pre><code class="language-js">
+// Hard wait (demo/debug only)
+await page.waitForTimeout(3000);
+
+// Auto-wait with locator actions
+await page.locator('#login').click();
+
+// Explicit wait for a selector
+await page.waitForSelector('.oxd-text--h6');
+
+// Config timeouts (in playwright.config.js)
+module.exports = {
+  timeout: 30 * 1000,
+  expect: { timeout: 5000 }
+};
+</code></pre>
+    </div>
+
+    <!-- CH 1.7 – CHILD WINDOWS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.7 – Handling Child Windows / New Tabs</h2>
+
+<pre><code class="language-js">
+const { test, expect } = require('@playwright/test');
+
+test('Handle child window', async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
+
+  const documentLink = page.locator("[href*='documents-request']");
+
+  const [newPage] = await Promise.all([
+    context.waitForEvent('page'), // wait for new tab/window
+    documentLink.click()
+  ]);
+
+  const text = await newPage.locator('.red').textContent();
+  console.log('New page text:', text);
+});
+</code></pre>
+    </div>
+
+    <!-- CH 1.8 – IFRAMES -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.8 – iFrames</h2>
+
+<pre><code class="language-js">
+const frame = page.frameLocator('#iframeId');
+await frame.locator('#username').fill('admin');
+await frame.locator('#submit').click();
+</code></pre>
+    </div>
+
+    <!-- CH 1.9 – ALL LINKS + CLICK SPECIFIC (WIKIPEDIA) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.9 – All Links on Page & Click Specific (Wikipedia)</h2>
+
+<pre><code class="language-js">
+const { test, expect } = require('@playwright/test');
+
+test('Count and click links on Wikipedia', async ({ page }) => {
+  await page.goto('https://www.wikipedia.org/');
+
+  const allLinks = page.locator('a');
+  const linkCount = await allLinks.count();
+  console.log('Total links:', linkCount);
+  expect(linkCount).toBeGreaterThan(10);
+
+  // Click "English" link
+  await page.getByRole('link', { name: 'English' }).click();
+  await expect(page).toHaveURL(/en\.wikipedia\.org/);
+});
+</code></pre>
+    </div>
+
+    <!-- CH 1.10 – DROPDOWNS, FILE UPLOAD/DOWNLOAD, API, etc. -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.10 – Dropdowns, File Upload/Download, API Basics (Cheat)</h2>
+
+      <p class="code-title">Static dropdown (by value)</p>
+<pre><code class="language-js">
+await page.locator('select#country').selectOption('USA');
+</code></pre>
+
+      <p class="mt-4 code-title">File upload</p>
+<pre><code class="language-js">
+// Input type="file"
+const fileInput = page.locator('input[type="file"]');
+await fileInput.setInputFiles('test-data/sample.pdf');
+</code></pre>
+
+      <p class="mt-4 code-title">File download</p>
+<pre><code class="language-js">
+const [ download ] = await Promise.all([
+  page.waitForEvent('download'),
+  page.getByText('Download').click()
+]);
+
+const path = await download.path();
+console.log('Downloaded file path:', path);
+</code></pre>
+
+      <p class="mt-4 code-title">API test basic example</p>
+<pre><code class="language-js">
+const { test, expect } = require('@playwright/test');
+
+test('GET users API', async ({ request }) => {
+  const response = await request.get('https://reqres.in/api/users?page=2');
+  expect(response.status()).toBe(200);
+
+  const body = await response.json();
+  console.log(body);
+  expect(body.data.length).toBeGreaterThan(0);
+});
+</code></pre>
+    </div>
+
+    <!-- CH 1.11 – SPLIT TEXT (EMAIL & DOMAIN) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>1.11 – Extract & Split Text (email, domain)</h2>
+
+<pre><code class="language-js">
+const text = await newPage.locator('.red').textContent();
+// Example: "Please email us at mentor@rahulshettyacademy.com with..."
+
+const afterAt = text.split('at')[1].trim();    // "mentor@rahulshettyacademy.com with..."
+const fullEmail = afterAt.split(' ')[0];       // "mentor@rahulshettyacademy.com"
+const domain    = fullEmail.split('@')[1];     // "rahulshettyacademy.com"
+
+await page.locator('#username').fill(domain);
+</code></pre>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- SECTION 2 – END TO END POM FRAMEWORK (ORANGEHRM)          -->
+    <!-- ========================================================= -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2 class="text-2xl font-bold mb-3">SECTION 2 – End-to-End POM Framework (OrangeHRM + Parallel + Allure)</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        This section is your full framework: POM structure, parallel tests, and Allure reports using OrangeHRM demo.
+      </p>
+    </div>
+
+    <!-- 2.1 – FOLDER STRUCTURE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.1 – Framework Folder Structure</h2>
+
+<pre><code class="language-text">
+playwright-orangehrm-framework/
+ ├── tests/
+ │     ├── login.spec.js
+ │     └── employee-search.spec.js
+ ├── pages/
+ │     ├── OrangeHRMLoginPage.js
+ │     └── OrangeHRMDashboardPage.js
+ ├── test-data/
+ │     └── users.json
+ ├── utils/
+ │     └── logger.js
+ ├── playwright.config.js
+ ├── package.json
+ └── README.md
+</code></pre>
+    </div>
+
+    <!-- 2.2 – PACKAGE.JSON + INSTALL ALLURE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.2 – package.json + Install Allure</h2>
+
+<pre><code class="language-bash">
+# Inside project folder
+npm init -y
+npm install --save-dev @playwright/test allure-playwright allure-commandline
+</code></pre>
+
+<pre><code class="language-json">
+{
+  "name": "playwright-orangehrm-framework",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "report": "npx playwright show-report",
+    "allure:generate": "allure generate ./allure-results --clean -o ./allure-report",
+    "allure:open": "allure open ./allure-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "allure-playwright": "^2.15.0",
+    "allure-commandline": "^2.27.0"
+  }
+}
+</code></pre>
+    </div>
+
+    <!-- 2.3 – PLAYWRIGHT.CONFIG WITH ALLURE & PARALLEL -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.3 – playwright.config.js with Allure & Parallel</h2>
+
+<pre><code class="language-js">
+// @ts-check
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
+  testDir: './tests',
+  timeout: 30 * 1000,
+  expect: {
+    timeout: 5000
+  },
+  fullyParallel: true,
+  workers: 4,
+  retries: 1,
+  reporter: [
+    ['list'],
+    ['html'],
+    ['allure-playwright'] // writes to ./allure-results
+  ],
+  use: {
+    baseURL: 'https://opensource-demo.orangehrmlive.com',
+    browserName: 'chromium',
+    headless: false,
+    viewport: { width: 1280, height: 720 },
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure'
+  }
+});
+</code></pre>
+    </div>
+
+    <!-- 2.4 – TEST DATA -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.4 – Test Data (users.json)</h2>
+
+<pre><code class="language-json">
+{
+  "validUser": {
+    "username": "Admin",
+    "password": "admin123"
+  },
+  "invalidUser": {
+    "username": "wrongUser",
+    "password": "wrongPass"
+  }
+}
+</code></pre>
+    </div>
+
+    <!-- 2.5 – PAGES: LOGIN PAGE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.5 – Page Object: OrangeHRMLoginPage.js</h2>
+
+<pre><code class="language-js">
+// pages/OrangeHRMLoginPage.js
+class OrangeHRMLoginPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
+  constructor(page) {
+    this.page = page;
+    this.usernameInput = page.locator('input[name="username"]');
+    this.passwordInput = page.locator('input[name="password"]');
+    this.loginButton   = page.getByRole('button', { name: 'Login' });
+    this.errorToast    = page.locator('.oxd-alert-content-text');
+  }
+
+  async goto() {
+    await this.page.goto('/web/index.php/auth/login');
+  }
+
+  async login(username, password) {
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
+  }
+
+  async loginValidDefault() {
+    await this.login('Admin', 'admin123');
+  }
+}
+
+module.exports = { OrangeHRMLoginPage };
+</code></pre>
+    </div>
+
+    <!-- 2.6 – PAGES: DASHBOARD PAGE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.6 – Page Object: OrangeHRMDashboardPage.js</h2>
+
+<pre><code class="language-js">
+// pages/OrangeHRMDashboardPage.js
+class OrangeHRMDashboardPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
+  constructor(page) {
+    this.page = page;
+    this.dashboardTitle = page.locator('h6.oxd-text--h6');
+    this.userDropdown   = page.locator('.oxd-userdropdown-name');
+    this.logoutLink     = page.getByRole('menuitem', { name: 'Logout' });
+  }
+
+  async assertOnDashboard() {
+    await this.page.waitForURL('**/dashboard/index');
+    await this.dashboardTitle.waitFor();
+  }
+
+  async logout() {
+    await this.userDropdown.click();
+    await this.logoutLink.click();
+  }
+}
+
+module.exports = { OrangeHRMDashboardPage };
+</code></pre>
+    </div>
+
+    <!-- 2.7 – LOGIN TEST (POM + PARALLEL) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.7 – Login Test (POM, Ready for Parallel)</h2>
+
+<pre><code class="language-js">
+// tests/login.spec.js
+const { test, expect } = require('@playwright/test');
+const { OrangeHRMLoginPage } = require('../pages/OrangeHRMLoginPage');
+const { OrangeHRMDashboardPage } = require('../pages/OrangeHRMDashboardPage');
+const users = require('../test-data/users.json');
+
+test.describe.parallel('OrangeHRM Login Tests', () => {
+
+  test('Valid login navigates to dashboard', async ({ page }) => {
+    const loginPage = new OrangeHRMLoginPage(page);
+    const dashboard = new OrangeHRMDashboardPage(page);
+
+    await loginPage.goto();
+    await loginPage.login(users.validUser.username, users.validUser.password);
+
+    await dashboard.assertOnDashboard();
+    await expect(dashboard.dashboardTitle).toContainText('Dashboard');
+  });
+
+  test('Invalid login shows error message', async ({ page }) => {
+    const loginPage = new OrangeHRMLoginPage(page);
+
+    await loginPage.goto();
+    await loginPage.login(users.invalidUser.username, users.invalidUser.password);
+
+    await expect(loginPage.errorToast).toBeVisible();
+  });
+
+});
+</code></pre>
+    </div>
+
+    <!-- 2.8 – RUN TESTS + GENERATE ALLURE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.8 – Run Tests in Parallel & Generate Allure Report</h2>
+
+<pre><code class="language-bash">
+# Run all tests in parallel as per config
+npm test
+
+# Or explicitly
+npx playwright test --workers=4
+
+# After tests are done, generate Allure report
+npm run allure:generate
+
+# Open Allure report
+npm run allure:open
+</code></pre>
+    </div>
+
+    <!-- 2.9 – GITHUB ACTIONS CI SAMPLE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>2.9 – GitHub Actions CI (Playwright + Allure)</h2>
+
+<pre><code class="language-yaml">
+name: Playwright OrangeHRM CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - name: Generate Allure Report
+        run: |
+          npx allure generate ./allure-results --clean -o ./allure-report
+
+      - name: Upload Allure Report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: ./allure-report
+</code></pre>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- SECTION 3 – CORE JAVASCRIPT FOR SDET                      -->
+    <!-- ========================================================= -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2 class="text-2xl font-bold mb-3">SECTION 3 – Core JavaScript Concepts for SDET</h2>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        JavaScript basics used daily in Playwright: arrays, objects, async/await, split, map/filter, etc.
+      </p>
+    </div>
+
+    <!-- 3.1 – VARIABLES & DATA TYPES -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.1 – Variables & Data Types</h2>
+
+<pre><code class="language-js">
+let count = 0;                 // mutable
+const baseUrl = 'https://...'; // constant
+
+let name = 'Rubel';            // string
+let age = 30;                  // number
+let isActive = true;           // boolean
+let skills = ['JS', 'Playwright']; // array
+let user = { name: 'Rubel', role: 'SDET' }; // object
+</code></pre>
+    </div>
+
+    <!-- 3.2 – FUNCTIONS, ARROW FUNCTIONS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.2 – Functions & Arrow Functions</h2>
+
+<pre><code class="language-js">
+function add(a, b) {
+  return a + b;
+}
+
+const multiply = (a, b) => a * b;
+
+console.log(add(2, 3));       // 5
+console.log(multiply(2, 3));  // 6
+</code></pre>
+    </div>
+
+    <!-- 3.3 – ARRAYS, MAP/FILTER/REDUCE -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.3 – Arrays, map, filter, reduce</h2>
+
+<pre><code class="language-js">
+const nums = [1, 2, 3, 4, 5];
+
+const doubled = nums.map(n => n * 2);         // [2,4,6,8,10]
+const evens   = nums.filter(n => n % 2 === 0); // [2,4]
+const sum     = nums.reduce((acc, n) => acc + n, 0); // 15
+</code></pre>
+    </div>
+
+    <!-- 3.4 – STRING METHODS (INCLUDING SPLIT) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.4 – String Methods (split, slice, includes)</h2>
+
+<pre><code class="language-js">
+const msg = 'Please email us at mentor@rahulshettyacademy.com';
+
+// split
+const parts = msg.split('at');  // ["Please email us ", " mentor@rahulshettyacademy.com"]
+const email = parts[1].trim().split(' ')[0];
+
+// includes
+console.log(msg.includes('email')); // true
+
+// slice
+const short = msg.slice(0, 20);
+console.log(short);
+</code></pre>
+    </div>
+
+    <!-- 3.5 – PROMISES & ASYNC/AWAIT -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.5 – Promises & async/await</h2>
+
+<pre><code class="language-js">
+function fakeApiCall() {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve('success'), 1000);
+  });
+}
+
+async function run() {
+  const result = await fakeApiCall();
+  console.log(result); // "success"
+}
+
+run();
+</code></pre>
+
+      <p class="text-sm mt-3">
+        Playwright tests are always <code>async</code>. You use <code>await</code> with <code>page.goto</code>,
+        <code>locator.click</code>, <code>request.get</code>, etc.
+      </p>
+    </div>
+
+    <!-- 3.6 – CLASSES & OBJECTS (POM STYLE) -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.6 – Classes & Objects (similar to POM)</h2>
+
+<pre><code class="language-js">
+class Calculator {
+  constructor(startValue = 0) {
+    this.value = startValue;
+  }
+
+  add(n) {
+    this.value += n;
+  }
+
+  getResult() {
+    return this.value;
+  }
+}
+
+const calc = new Calculator();
+calc.add(5);
+console.log(calc.getResult()); // 5
+</code></pre>
+    </div>
+
+    <!-- 3.7 – ERROR HANDLING -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.7 – Error Handling (try/catch)</h2>
+
+<pre><code class="language-js">
+try {
+  JSON.parse('invalid JSON');  // will throw
+} catch (err) {
+  console.error('Parsing failed:', err.message);
+}
+</code></pre>
+    </div>
+
+    <!-- 3.8 – JSON & API RESPONSES -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.8 – JSON Basics (used in API tests & test data)</h2>
+
+<pre><code class="language-js">
+const jsonString = '{"name":"Rubel","role":"SDET"}';
+
+const obj = JSON.parse(jsonString); // string -> object
+console.log(obj.name); // Rubel
+
+const backToString = JSON.stringify(obj); // object -> string
+console.log(backToString);
+</code></pre>
+    </div>
+
+    <!-- 3.9 – JS + PLAYWRIGHT INTERVIEW HIGHLIGHTS -->
+    <div class="chapter bg-white dark:bg-slate-900 p-6 rounded-xl shadow">
+      <h2>3.9 – JavaScript + Playwright Interview Highlights</h2>
+
+      <p class="mb-2"><strong>Q: Why do we use async/await in Playwright?</strong></p>
+      <p class="text-sm">
+        A: Playwright commands are asynchronous and return Promises. Using <code>async/await</code> makes the code look
+        synchronous and easier to read. It also ensures the step finishes before moving to the next step.
+      </p>
+
+      <p class="mt-3 mb-2"><strong>Q: Real-time example of using array methods with Playwright?</strong></p>
+<pre><code class="language-js">
+const productLocators = page.locator('.card-body b');
+const count = await productLocators.count();
+
+let names = [];
+for (let i = 0; i &lt; count; i++) {
+  const name = await productLocators.nth(i).textContent();
+  names.push(name.trim());
+}
+
+// Now you can apply JS array methods
+const filtered = names.filter(n => n.includes('Phone'));
+console.log(filtered);
+</code></pre>
+    </div>
+
+  </div> <!-- END MAIN WRAPPER -->
+
+  <br /><br />
+</body>
+</html>
